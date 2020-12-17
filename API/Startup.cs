@@ -11,15 +11,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 
 namespace API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IConfiguration _config;
+        public Startup(IConfiguration config)
         {
-            Configuration = configuration;
+            _config = config;
+
         }
         public IConfiguration Configuration { get; }
 
@@ -28,7 +29,7 @@ namespace API
         {
             services.AddDbContext<API.Data.DataContext>(options =>
             {
-                options.UseSqlite("Connection string");
+                options.UseSqlite(_config.GetConnectionString("DefaultConnection"));
             });
             services.AddControllers();
 
@@ -40,8 +41,6 @@ namespace API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
 
             app.UseHttpsRedirection();
